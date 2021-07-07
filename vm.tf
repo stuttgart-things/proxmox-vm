@@ -31,15 +31,11 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
       network,
     ]
   }
-  sshkeys = <<EOF
-    ${var.ci_ssh_public_key}
-    EOF
 
   connection {
     type     = "ssh"
     host     = self.ssh_host
     user     = self.ssh_user
-    password = var.ci_user_password
   }
 
   provisioner "remote-exec" {
