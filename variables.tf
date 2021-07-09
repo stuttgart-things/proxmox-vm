@@ -123,6 +123,16 @@ variable "vm_network_type" {
   description     = "network card type"
 }
 
+variable "vm_username" {
+  default         = ""
+  description     = "Username of VM"
+}
+
+variable "vm_password" {
+  default         = ""
+  description     = "Password of VM user"
+}
+
 variable "vm_network_address0" {
   default         = "ip=dhcp"
   description     = "The first IP address to assign to the guest (set to ip=dhcp to get a ip output)"
