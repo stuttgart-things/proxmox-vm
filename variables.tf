@@ -123,12 +123,12 @@ variable "vm_network_type" {
   description     = "network card type"
 }
 
-variable "vm_username" {
+variable "vm_ssh_user" {
   default         = ""
   description     = "Username of VM"
 }
 
-variable "vm_password" {
+variable "vm_ssh_password" {
   default         = ""
   description     = "Password of VM user"
 }
