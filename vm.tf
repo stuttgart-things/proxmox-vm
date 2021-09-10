@@ -37,9 +37,7 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
     host     = self.ssh_host
     user     = var.vm_ssh_user
     password = var.vm_ssh_password
-
   }
-
   provisioner "remote-exec" {
     inline = [
       "sudo echo '${count.index > 0 ? "${var.vm_name}-${count.index + 1}" : var.vm_name}' | sudo tee /etc/hostname",
