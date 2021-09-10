@@ -35,8 +35,8 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   connection {
     type     = "ssh"
     host     = self.ssh_host
-    user     = var.vm_ssh_user
-    password = var.vm_ssh_password
+    user     = awx
+    password = Atlan7is
   }
   provisioner "remote-exec" {
     inline = [
