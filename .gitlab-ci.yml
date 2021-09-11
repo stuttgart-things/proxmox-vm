@@ -1,2 +1,8 @@
+---
+stages:
+  - archive
+  
 include:
-  - remote: 'https://codehub.sva.de/patrick.hermann/gitlab-pipelines/-/raw/master/archive-modules-pipeline.yaml'
+  - project: Lab/stuttgart-things/stuttgart-things
+    file: build/gitlab/archive-module-pipeline.yaml
+    ref: master
