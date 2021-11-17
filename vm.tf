@@ -8,7 +8,6 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   clone_wait        = 45
   clone             = var.vm_template
   bios              = var.vm_firmware
-  os_type           = var.vm_provisioning_method
   ipconfig0         = var.vm_network_address0
   cores             = var.vm_num_cpus
   sockets           = var.vm_num_sockets
@@ -17,7 +16,6 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   bootdisk          = var.vm_bootdisk
   agent             = var.vm_guest_agent
   qemu_os           = var.vm_os_type
- # preprovision      = true
   disk {
     size            = var.vm_disk_size
     type            = var.vm_disk_type
