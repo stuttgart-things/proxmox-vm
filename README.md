@@ -106,7 +106,7 @@ For more information about the tf provider see:
 - [Terraform registry](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs) 
 
 ## Requirements and Dependencies:
-- [Terraform](https://www.terraform.io/downloads.html) 0.14.7 or greater
+- [Terraform](https://www.terraform.io/downloads.html) 1.0.11 or greater
 
 ## Version:
 ```
