@@ -1,5 +1,5 @@
 output "ip" {
-  value = proxmox_vm_qemu.proxmox_vm[*].ssh_host
+  value = proxmox_vm_qemu.proxmox_vm[*].default_ip_address
 }
 
 output "mac" {
