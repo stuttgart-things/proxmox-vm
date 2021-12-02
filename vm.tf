@@ -40,12 +40,9 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
     inline = [
       "sudo echo '${count.index > 0 ? "${var.vm_name}-${count.index + 1}" : var.vm_name}' | sudo tee /etc/hostname",
       "sudo systemd-machine-id-setup",
-      "domain=$(cat /etc/resolv.conf | grep search | grep -v con | awk '{print $2}')",
-      "host=$(hostname)",
-      "sudo sed -i '/^127/d' /etc/hosts && sudo sed -i '/^#/d' /etc/hosts",
-      "echo '127.0.0.1' $${host} $${host}'.'$${domain}' localhost' | sudo tee /etc/hosts",
       "sudo reboot -f"
     ]
+
     on_failure = continue
   }
 }
