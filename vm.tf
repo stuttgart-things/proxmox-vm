@@ -32,7 +32,7 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   }
   connection {
     type     = "ssh"
-    host     = self.default_ip_address
+    host     = self.default_ipv4_address
     user     = var.vm_ssh_user
     password = var.vm_ssh_password
   }
