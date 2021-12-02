@@ -40,7 +40,7 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
     inline = [
       "sudo echo '${count.index > 0 ? "${var.vm_name}-${count.index + 1}" : var.vm_name}' | sudo tee /etc/hostname",
       "sudo systemd-machine-id-setup",
-      "sudo reboot -f"
+      "sudo reboot &"
     ]
    # on_failure = continue
   }
