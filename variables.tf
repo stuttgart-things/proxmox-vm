@@ -1,23 +1,3 @@
-variable "api_url" {
-  default         = false
-  description     = "URL from proxmox API interface"
-}
-
-variable "api_user" {
-  default         = false
-  description     = "proxmox API user"
-}
-
-variable "api_password" {
-  default         = false
-  description     = "proxmox API password"
-}
-
-variable "api_tls_verify" {
-  default         = true
-  description     = "proxmox API disable check if cert is valid"
-}
-
 variable "pve_cluster_node" {
   default         = false
   description     = "name of proxmox cluster node"
