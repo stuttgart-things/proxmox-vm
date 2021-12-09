@@ -58,11 +58,6 @@ variable "vm_template" {
   description     = "name of proxmox virtual machine template"
 }
 
-variable "vm_provisioning_method" {
-  default         = "cloud-init"
-  description     = "provisioning method based on the OS type"
-}
-
 variable "vm_num_cpus" {
   default         = 2
   description     = "amount of cpus of the vm"
