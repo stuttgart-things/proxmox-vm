@@ -35,7 +35,6 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
     host     = self.default_ipv4_address
     user     = var.vm_ssh_user
     password = var.vm_ssh_password
-    agent    = false
   }
   provisioner "remote-exec" {
     inline = [
