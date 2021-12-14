@@ -42,6 +42,10 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
       "sudo systemd-machine-id-setup",
       "sudo shutdown -r +0"
     ]
-   # on_failure = continue
+    
+  provisioner "remote-exec" {
+    inline = [
+      "echo 'wait for reboot'"
+    ]
   }
 }
