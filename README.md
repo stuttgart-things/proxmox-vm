@@ -37,7 +37,6 @@ module "proxmox-vm" {
   vm_name                 = "cstream8-test"
   vm_notes                = "cstream8-blal"
   vm_template             = "cstream8"
-  vm_provisioning_method  = "centos"
   vm_num_cpus             = "4"
   vm_memory               = "4096"
   vm_disk_size            = "35G"
