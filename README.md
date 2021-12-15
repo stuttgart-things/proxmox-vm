@@ -29,9 +29,6 @@ provider "proxmox" {
 
 module "proxmox-vm" {
   source                  = "https://artifacts.labul.sva.de/modules/proxmox-vm.zip"
-  api_url                 = var.pve_api_url
-  api_user                = var.pve_api_user
-  api_password            = var.pve_api_password
   pve_cluster_node        = "sthings-pve1"
   pve_datastore           = "datastore"
   pve_folder_path         = "stuttgart-things"
