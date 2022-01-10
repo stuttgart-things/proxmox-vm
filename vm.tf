@@ -6,7 +6,6 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   name              = count.index > 0 ? "${var.vm_name}-${count.index + 1}" : var.vm_name
   desc              = var.vm_notes
   clone_wait        = 45
-  pm_timeout        = 500
   clone             = var.vm_template
   bios              = var.vm_firmware
   ipconfig0         = var.vm_network_address0
