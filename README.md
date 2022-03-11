@@ -104,6 +104,12 @@ For more information about the tf provider see:
 ## Requirements and Dependencies:
 - [Terraform](https://www.terraform.io/downloads.html) 1.0.11 or greater
 
+## Outputs
+
+ - `ip` - ip address of created vm
+ - `mac` - mac address of created vm
+ - `id` - proxmox id of created vm
+
 ## Version:
 ```
 DATE           WHO            WHAT
