@@ -73,6 +73,7 @@ variable "pve_api_tls_verify" {
   default     = true
   description = "proxmox API disable check if cert is valid"
 }
+EOF
 ```
 Run terraform init to download the module and provider
 
