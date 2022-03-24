@@ -8,7 +8,7 @@ terraform module to build a proxmox vm /w config from a generic vm-template
 Get the exmaple main.tf and set your variables
 
 ```
-cat <<EOF > /tmp/main.tf
+cat <<EOF > main.tf
 terraform {
 
 
