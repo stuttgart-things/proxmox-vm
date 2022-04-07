@@ -22,8 +22,9 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
     storage = var.pve_datastore
   }
   network {
-    model  = var.vm_network_type
-    bridge = var.pve_network
+    model   = var.vm_network_type
+    bridge  = var.pve_network
+    macaddr = var.vm_macaddr
   }
   lifecycle {
     ignore_changes = [

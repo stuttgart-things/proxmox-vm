@@ -112,3 +112,8 @@ variable "vm_network_address0" {
   default     = "ip=dhcp"
   description = "The first IP address to assign to the guest (set to ip=dhcp to get a ip output)"
 }
+
+variable "vm_macaddr" {
+  default     = null
+  description = "Mac address of desired vm"
+}
