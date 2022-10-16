@@ -4,5 +4,5 @@ stages:
   
 include:
   - project: Lab/stuttgart-things/stuttgart-things
-    file: build/gitlab/archive-module-pipeline.yaml
+    file: build/gitlab/tasks/archive-module-pipeline.yaml
     ref: master
