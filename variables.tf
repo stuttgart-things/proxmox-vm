@@ -23,6 +23,11 @@ variable "vm_numa" {
   description = "enable numa for vm"
 }
 
+variable "vm_onboot" {
+  default     = true
+  description = "whether to have the VM startup after the PVE node starts"
+}
+
 variable "vm_firmware" {
   default     = "seabios"
   description = "the firmware interface to use on the virtual machine. Can be one of bios or EFI. Default: bios"
