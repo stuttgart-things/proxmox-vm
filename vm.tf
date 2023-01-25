@@ -2,6 +2,7 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   target_node = var.pve_cluster_node
   pool        = var.pve_folder_path
   numa        = var.vm_numa
+  onboot      = var.onboot
   count       = var.vm_count
   name        = count.index > 0 ? "${var.vm_name}-${count.index + 1}" : var.vm_name
   desc        = var.vm_notes
