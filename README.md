@@ -15,7 +15,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "Telmate/proxmox"
-      version = ">= 2.9.11"
+      version = ">= 2.9.13"
     }
   }
 }
@@ -28,8 +28,7 @@ provider "proxmox" {
 }
 
 module "proxmox-vm" {
-  source                  = "https://artifacts.labul.sva.de/modules/proxmox-vm.zip"
-#  source                  = "git::https://codehub.sva.de/Lab/stuttgart-things/virtual-machines/proxmox-vm.git"
+  source                  = "https://github.com/stuttgart-things/proxmox-vm.git"
   pve_cluster_node        = "sthings-pve1"
   pve_datastore           = "datastore"
   pve_folder_path         = "stuttgart-things"
@@ -56,7 +55,7 @@ output "id" {
 }
 
 variable "pve_api_url" {
-  default     = "https://sthings-pve1.labul.sva.de:8006/api2/json"
+  default     = "https://sthings-pve1.example.com:8006/api2/json"
   description = "url of proxmox api"
 }
 
@@ -95,7 +94,7 @@ terraform destroy
 ```
 
 ## Available terraform variables:
-The variables are documented in the file: [variables.tf](https://codehub.sva.de/Lab/stuttgart-things/virtual-machines/proxmox-vm-cloudinit/-/blob/master/variables.tf) 
+The variables are documented in the file: [variables.tf](https://tbd) 
 
 ## Terraform provider
 For more information about the tf provider see:
@@ -104,7 +103,7 @@ For more information about the tf provider see:
 - [Terraform registry](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs) 
 
 ## Requirements and Dependencies:
-- [Terraform](https://www.terraform.io/downloads.html) 1.0.11 or greater
+- [Terraform](https://www.terraform.io/downloads.html) 1.0.13 or greater
 
 ## Outputs
 
@@ -126,4 +125,4 @@ BSD
 Author Information
 ------------------
 
-Marcel Zapf; 09/2021; SVA GmbH
+Marcel Zapf; 09/2021; Stuttgart-Things
