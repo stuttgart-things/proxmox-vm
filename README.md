@@ -28,7 +28,7 @@ provider "proxmox" {
 }
 
 module "proxmox-vm" {
-  source                  = "https://github.com/stuttgart-things/proxmox-vm.git"
+  source                  = "git::https://github.com/stuttgart-things/proxmox-vm.git"
   pve_cluster_node        = "sthings-pve1"
   pve_datastore           = "datastore"
   pve_folder_path         = "stuttgart-things"
