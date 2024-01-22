@@ -165,3 +165,27 @@ variable "vm_macaddr" {
   type        = string
   description = "Mac address of desired vm"
 }
+
+variable "pve_api_url" {
+  default     = false
+  type        = string
+  description = "url of proxmox api"
+}
+
+variable "pve_api_user" {
+  default     = false
+  type        = string
+  description = "username of proxmox api user"
+}
+
+variable "pve_api_password" {
+  default     = false
+  type        = string
+  description = "password of proxmox api user"
+}
+
+variable "pve_api_tls_verify" {
+  default     = true
+  type        = bool
+  description = "proxmox API disable check if cert is valid"
+}
