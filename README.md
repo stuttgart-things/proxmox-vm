@@ -1,6 +1,6 @@
 # stuttgart-things/proxmox-vm
 
-terraform for creating proxmox vms
+terraform module for creating proxmox vms
 
 ## EXAMPLE USAGE TERRAFORM
 
