@@ -109,6 +109,7 @@ variable "vm_memory" {
 variable "vm_disk_size" {
   default     = "32G"
   description = "size of disk"
+  type        = string
 
   validation {
     condition     = contains(["20G", "32G", "64G", "96G", "128G", "196G", "256G"], var.vm_disk_size)
