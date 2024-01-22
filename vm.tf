@@ -16,25 +16,25 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   bootdisk    = var.vm_bootdisk
   agent       = var.vm_guest_agent
   qemu_os     = var.vm_os_type
-  
+
   disk {
     size    = var.vm_disk_size
     type    = var.vm_disk_type
     storage = var.pve_datastore
   }
-  
+
   network {
     model   = var.vm_network_type
     bridge  = var.pve_network
     macaddr = var.vm_macaddr
   }
-  
+
   lifecycle {
     ignore_changes = [
       network,
     ]
   }
-  
+
   connection {
     type     = "ssh"
     host     = self.default_ipv4_address

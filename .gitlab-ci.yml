@@ -1,8 +1,0 @@
----
-stages:
-  - archive
-  
-include:
-  - project: Lab/stuttgart-things/stuttgart-things
-    file: build/gitlab/tasks/archive-module-pipeline.yaml
-    ref: master
