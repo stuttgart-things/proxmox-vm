@@ -1,25 +1,12 @@
-stuttgart-things/proxmox-vm
-=========================================
+# stuttgart-things/proxmox-vm
 
-terraform module to build a proxmox vm /w config from a generic vm-template
+terraform for creating proxmox vms
 
-### Example to use this terraform module
+## EXAMPLE USAGE
 
-Get the exmaple main.tf and set your variables
+<details><summary><b>CREATE PVE VM</b></summary>
 
-```
-cat <<EOF > main.tf
-terraform {
-
-
-  required_providers {
-    proxmox = {
-      source  = "Telmate/proxmox"
-      version = ">= 2.9.13"
-    }
-  }
-}
-
+```hcl
 provider "proxmox" {
     pm_api_url      = var.pve_api_url
     pm_user         = var.pve_api_user
@@ -73,49 +60,34 @@ variable "pve_api_tls_verify" {
   default     = true
   description = "proxmox API disable check if cert is valid"
 }
-EOF
 ```
-Run terraform init to download the module and provider
 
-```
+</details>
+
+<details><summary><b>EXECUTION</b></summary>
+
+```bash
+# Run terraform init to download the module and provider
 terraform init
 ```
 
-Apply to create the tf ressources in proxmox
-
-```
+```bash
+# Apply to create the tf ressources in proxmox
 terraform apply
 ```
 
-To delete the tf managed ressources run destroy
-
-```
+```bash
+# To delete the tf managed ressources run destroy
 terraform destroy
 ```
 
-## Available terraform variables:
-The variables are documented in the file: [variables.tf](https://tbd) 
+</details>
 
-## Terraform provider
-For more information about the tf provider see:
-
-- [Github](https://github.com/Telmate/terraform-provider-proxmox)
-- [Terraform registry](https://registry.terraform.io/providers/Telmate/proxmox/latest/docs) 
-
-## Requirements and Dependencies:
-- [Terraform](https://www.terraform.io/downloads.html) 1.0.13 or greater
-
-## Outputs
+## OUTPUTS
 
  - `ip` - ip address of created vm
  - `mac` - mac address of created vm
  - `id` - proxmox id of created vm
-
-## Version:
-```
-DATE           WHO            WHAT
-2021-09-13     Marcel Zapf    Create tf module
-```
 
 License
 -------
