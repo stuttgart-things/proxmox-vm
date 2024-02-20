@@ -45,7 +45,7 @@ output "id" {
 
 
 variable "pve_api_url" {
-  description = "url of proxmox api"
+  description = "url of proxmox api. Example: https://server-example.sva.de:8006/api2/json"
 }
  
 variable "pve_api_user" {
@@ -57,11 +57,11 @@ variable "pve_api_password" {
 }
  
 variable "vm_ssh_user" {
-  description = "username of proxmox api user"
+  description = "desired username for ssh connection"
 }
  
 variable "vm_ssh_password" {
-  description = "password of proxmox api user"
+  description = "desired password for ssh connection"
 }
  
 variable "pve_api_tls_verify" {
@@ -71,7 +71,7 @@ variable "pve_api_tls_verify" {
 
 ```
 # VARIABLES -tfvars
-pve_api_url="<API-URL>"    #Example: "https://server-example.sva.de:8006/api2/json"
+pve_api_url="<API-URL>"  
 pve_api_user="<API-USER>"
 pve_api_password="<API-PASSWORD>"
 pve_api_tls_verify = true
