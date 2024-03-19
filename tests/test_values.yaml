@@ -1,0 +1,14 @@
+---
+# names should be match what the module expects
+vm_count: # list or thing of range notation like 1-3; # should pick one of them randomly
+  - 1
+  - 2
+  - 3
+vm_num_cpus: # should pick one of them randomly
+  - 2
+  - 4
+  - 8
+#vm_name: #E.G. RANDOM NAME W/ LENGHT XY OR PREFIX MAYBE - UP TO YOU BUT THING OF CONSTRAINS LIKE LENGHT OR FORBIDDEN CHARS LIKE _
+pve_datastore: # should pick one of them randomly
+  - datastore
+  - v3700 
