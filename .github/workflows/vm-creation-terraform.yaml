@@ -21,18 +21,14 @@ env:
 jobs:
 
   build-terraform-file:
-    runs-on: ghr-proxmox-vm-sthings-cicd
-    container:
-      image: hashicorp/terraform:1.7.0
-    environment: k8s
-    
+    runs-on: ghr-proxmox-vm-sthings-cicd    
     steps:
-    - uses: actions/checkout@v4
-
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
+      env:
+        AGENT_TOOLSDIRECTORY: /home/runner/_work/_tool
 
     - name: Install dependencies
       run: |
@@ -47,26 +43,22 @@ jobs:
       with:
         name: terraform_main
         path: main.tf
-        
-    - name: DEBUG
-      shell: bash
-      run: |
-        echo "/home/runner/_work/_tool/"
-        ls -la /home/runner/_work/_tool/
 
   test-terraform-apply:
     needs: build-terraform-file
     runs-on: ghr-proxmox-vm-sthings-cicd
-    container:
-      image: hashicorp/terraform:1.7.0
-    environment: k8s
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+        uses: actions/checkout@v4.1.1
 
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
+
+    - uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.7.0"
 
     - name: Install dependencies
       run: |
@@ -96,16 +88,17 @@ jobs:
     if: ${{ always() }}
     needs: test-terraform-apply
     runs-on: ghr-proxmox-vm-sthings-cicd
-    container:
-      image: hashicorp/terraform:1.7.0
-    environment: k8s
     steps:
-    - uses: actions/checkout@v4
-
+    - name: Checkout code
+        uses: actions/checkout@v4.1.1
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
+
+    - uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.7.0"
 
     - name: Install dependencies
       run: |
