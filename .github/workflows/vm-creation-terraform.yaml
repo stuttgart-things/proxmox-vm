@@ -21,7 +21,7 @@ env:
 jobs:
 
   build-terraform-file:
-    runs-on: arc-runner-scale-set-proxmox-vm
+    runs-on: ghr-proxmox-vm-sthings-cicd
     steps:
     - uses: actions/checkout@v4
 
@@ -43,7 +43,7 @@ jobs:
       with:
         name: terraform_main
         path: main.tf
-    
+        
     - name: DEBUG
       shell: bash
       run: |
@@ -54,7 +54,7 @@ jobs:
 
   test-terraform-apply:
     needs: build-terraform-file
-    runs-on: arc-runner-scale-set-proxmox-vm
+    runs-on: ghr-proxmox-vm-sthings-cicd
     steps:
     - uses: actions/checkout@v4
 
@@ -90,7 +90,7 @@ jobs:
   cleanup:
     if: ${{ always() }}
     needs: test-terraform-apply
-    runs-on: arc-runner-scale-set-proxmox-vm
+    runs-on: ghr-proxmox-vm-sthings-cicd
     steps:
     - uses: actions/checkout@v4
 
