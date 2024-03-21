@@ -55,7 +55,6 @@ jobs:
   test-terraform-apply:
     needs: build-terraform-file
     runs-on: ghr-proxmox-vm-sthings-cicd
-    environment-name: k8s
     steps:
     - uses: actions/checkout@v4
 
