@@ -93,7 +93,7 @@ jobs:
     - run: |
           terraform init
           terraform plan -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
-          terraform apply -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
+          terraform apply --auto-approve -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
 
     - name: Upload tfstate file for cleanup
       if: always()
