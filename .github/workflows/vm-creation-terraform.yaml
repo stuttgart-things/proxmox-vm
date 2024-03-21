@@ -23,6 +23,8 @@ jobs:
   build-terraform-file:
     runs-on: ghr-proxmox-vm-sthings-cicd    
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.1.1
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
@@ -49,7 +51,7 @@ jobs:
     runs-on: ghr-proxmox-vm-sthings-cicd
     steps:
     - name: Checkout code
-        uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4.1.1
 
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -90,7 +92,8 @@ jobs:
     runs-on: ghr-proxmox-vm-sthings-cicd
     steps:
     - name: Checkout code
-        uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4.1.1
+      
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
