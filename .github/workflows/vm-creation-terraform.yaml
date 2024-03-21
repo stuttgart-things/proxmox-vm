@@ -43,6 +43,13 @@ jobs:
       with:
         name: terraform_main
         path: main.tf
+    
+    - name: DEBUG
+      shell: bash
+      run: |
+        echo $PATH
+        ls -la /usr/local/bin/
+        ls -la $PATH
 
 
   test-terraform-apply:
