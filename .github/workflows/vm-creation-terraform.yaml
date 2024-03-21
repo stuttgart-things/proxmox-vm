@@ -48,8 +48,7 @@ jobs:
       shell: bash
       run: |
         echo $PATH
-        ls -la /home/runner
-        ls -la /home/runner/_work/_tool/
+        ls -la /home/runner/bin
 
 
 

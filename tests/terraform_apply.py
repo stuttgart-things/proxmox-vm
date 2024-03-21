@@ -8,7 +8,7 @@ def main():
   
   # Initialize the Terraform working directory
   global tf
-  tf = python_terraform.Terraform(working_dir='.', variables=tfvars)
+  tf = python_terraform.Terraform(working_dir='.', variables=tfvars, terraform_bin_path='/home/runner/bin')
   tf.init()
 
   # Run terraform Apply and Terraform Destroy
