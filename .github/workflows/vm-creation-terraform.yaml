@@ -9,36 +9,73 @@ on:
       - fix/*
   pull_request:
     types: [opened, reopened]
-
-env:
-  pve_api_url: ${{ secrets.PVE_API_URL }}
-  pve_api_user: ${{ secrets.PVE_API_USER }}
-  pve_api_password: ${{ secrets.PVE_API_PASSWORD }}
-  vm_ssh_user: ${{ secrets.VM_SSH_USER }}
-  vm_ssh_password: ${{ secrets.VM_SSH_PASSWORD }}
-  pve_api_tls_verify: ${{ vars.PVE_API_TLS_VERIFY }}
   
 jobs:
 
   build-terraform-file:
-    runs-on: ghr-proxmox-vm-sthings-cicd    
+    runs-on: ghr-proxmox-vm-sthings-cicd
+    environment: k8s
+    container:
+      image: eu.gcr.io/stuttgart-things/machineshop:v1.7.2 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-      env:
-        AGENT_TOOLSDIRECTORY: /home/runner/_work/_tool
-
     - name: Install dependencies
+      id: pip
       run: |
-        python -m pip install github-action-utils PyYAML Jinja2
+        pip install github-action-utils PyYAML Jinja2
 
-    - name: Run Python to build main.tf from template
-      run: |
-        python3 tests/build_tf_file.py 
+    - name: Create VM config
+      id: renderConfig
+      uses: jannekem/run-python-script-action@v1.7
+      with:
+          script: |
+            import yaml as yaml
+            import random
+            import string
+            from jinja2 import Environment, FileSystemLoader
+            import github_action_utils as gha_utils
+
+            def random_string_generation(length):
+              # choose random lowercase letters for unique name
+              letters = string.ascii_lowercase
+              result_str = ''.join(random.choice(letters) for i in range(length))
+              return result_str
+
+            def write_file(testVars, output_file_name):
+              environment = Environment(loader=FileSystemLoader("tests/templates/"))
+              template = environment.get_template("module.tpl")
+              filename = "main.tf"
+              content = template.render(
+                    name = output_file_name,
+                    vm_count = random.choice(testVars['vm_count']),
+                    vm_num_cpus = random.choice(testVars['vm_num_cpus']),
+                    pve_datastore = random.choice(testVars['pve_datastore']),
+                )
+
+              # Save template
+              with open(filename, mode="w", encoding="utf-8") as message:
+                    message.write(content)
+                    print(f"... wrote {filename}")
+
+            def main():
+              ### Generate Random String for VM name
+              str_tfvarName = "pipeline-" + random_string_generation(length = 5)
+              gha_utils.append_job_summary("Unique Name for VM's: " + str_tfvarName)
+
+              ### Import Yaml file with all possible test values
+              with open('tests/test_values.yaml', 'r') as file:
+                testVars = yaml.safe_load(file)
+              print(testVars)
+              write_file(testVars, str_tfvarName)
+
+            if __name__ == '__main__':
+              main()
+
 
     - name: Upload main.tf file for job 2
       uses: actions/upload-artifact@v4
@@ -49,33 +86,17 @@ jobs:
   test-terraform-apply:
     needs: build-terraform-file
     runs-on: ghr-proxmox-vm-sthings-cicd
+    environment: k8s
+    container:
+      image: hashicorp/terraform:1.6
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4
     
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 20
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-
-    - uses: hashicorp/setup-terraform@v3
-
-    - name: Install dependencies
-      run: |
-        python -m pip install github-action-utils  python-terraform
-
-    - name: Download main.tf
-      uses: actions/download-artifact@v4
-      with:
-        name: terraform_main
-
-    - name: Run in Python Terraform Apply
-      run: |
-        python3 tests/terraform_apply.py
+    - run: |
+          terraform init
+          terraform plan -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
+          terraform apply -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
 
     - name: Upload tfstate file for cleanup
       if: always()
@@ -86,40 +107,40 @@ jobs:
 
     - name: Run in Python Terraform Destroy
       run: |
-        python3 tests/terraform_destroy.py
+        terraform destroy --auto-approve -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
 
-  cleanup:
-    if: ${{ always() }}
-    needs: test-terraform-apply
-    runs-on: ghr-proxmox-vm-sthings-cicd
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.1.1
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 20
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-
-    - uses: hashicorp/setup-terraform@v3
-
-    - name: Install dependencies
-      run: |
-        python -m pip install github-action-utils  python-terraform
-
-    - name: Download tfstate
-      uses: actions/download-artifact@v4
-      with:
-        name: terraform_state
-
-    - name: Download main
-      uses: actions/download-artifact@v4
-      with:
-        name: terraform_main
-
-    - name: Run Python Terraform Destroy
-      run: |
-        python3 tests/terraform_destroy.py
+#  cleanup:
+#    if: ${{ always() }}
+#    needs: test-terraform-apply
+#    runs-on: self-hosted
+#    steps:
+#    - name: Checkout code
+#      uses: actions/checkout@v4
+#    - uses: actions/setup-node@v4
+#      with:
+#        node-version: 20
+#
+#    - name: Setup Python
+#      uses: actions/setup-python@v5
+#      with:
+#        python-version: '3.10'
+#
+#    - uses: hashicorp/setup-terraform@v3
+#
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install github-action-utils  python-terraform
+#
+#    - name: Download tfstate
+#      uses: actions/download-artifact@v4
+#      with:
+#        name: terraform_state
+#
+#    - name: Download main
+#      uses: actions/download-artifact@v4
+#      with:
+#        name: terraform_main
+#
+#    - name: Run Python Terraform Destroy
+#      run: |
+#        python3 tests/terraform_destroy.py
