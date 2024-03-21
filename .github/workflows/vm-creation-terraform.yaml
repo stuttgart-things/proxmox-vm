@@ -7,6 +7,8 @@ on:
       - feature/*
       - review/*
       - fix/*
+  pull_request:
+    types: [opened, reopened]
 
 env:
   pve_api_url: ${{ secrets.PVE_API_URL }}
@@ -18,9 +20,8 @@ env:
   
 jobs:
 
-  job_1:
-    runs-on: self-hosted
-
+  build-terraform-file:
+    runs-on: ghr-proxmox-vm-sthings-cicd
     steps:
     - uses: actions/checkout@v4
 
@@ -44,10 +45,9 @@ jobs:
         path: main.tf
 
 
-  job_2:
-
-    needs: job_1
-    runs-on: self-hosted
+  test-terraform-apply:
+    needs: build-terraform-file
+    runs-on: ghr-proxmox-vm-sthings-cicd
     steps:
     - uses: actions/checkout@v4
 
@@ -82,8 +82,8 @@ jobs:
 
   cleanup:
     if: ${{ always() }}
-    needs: job_2
-    runs-on: self-hosted
+    needs: test-terraform-apply
+    runs-on: ghr-proxmox-vm-sthings-cicd
     steps:
     - uses: actions/checkout@v4
 
