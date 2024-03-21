@@ -43,7 +43,7 @@ jobs:
       with:
         name: terraform_main
         path: main.tf
-    
+        
     - name: DEBUG
       shell: bash
       run: |
