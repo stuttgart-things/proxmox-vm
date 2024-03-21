@@ -52,6 +52,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4.1.1
+    
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
 
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -59,8 +63,6 @@ jobs:
         python-version: '3.10'
 
     - uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: "1.7.0"
 
     - name: Install dependencies
       run: |
@@ -93,15 +95,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4.1.1
-      
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
     - uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: "1.7.0"
 
     - name: Install dependencies
       run: |
