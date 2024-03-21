@@ -48,7 +48,7 @@ jobs:
       shell: bash
       run: |
         echo $PATH
-        ls -la /home/runner/bin
+        ls -la /home/runner/k8s
 
 
 
