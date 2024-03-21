@@ -48,8 +48,12 @@ jobs:
       shell: bash
       run: |
         echo $PATH
-        ls -la /usr/local/bin/
-        ls -la $PATH
+        ls -la /bin/terr*
+        ls -la /sbin/terr*
+        ls -la /usr/bin/terr*
+        ls -la /usr/sbin/terr*
+        ls -la /usr/local/sbin/terr*
+        ls -la /home/runner/_work/_tool/
 
 
   test-terraform-apply:
