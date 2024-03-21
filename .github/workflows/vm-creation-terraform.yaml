@@ -47,10 +47,8 @@ jobs:
     - name: DEBUG
       shell: bash
       run: |
-        echo $PATH
-        ls -la /home/runner/k8s
-
-
+        echo "/home/runner/_work/_tool/"
+        ls -la /home/runner/_work/_tool/
 
   test-terraform-apply:
     needs: build-terraform-file
