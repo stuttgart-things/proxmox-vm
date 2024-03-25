@@ -46,7 +46,7 @@ jobs:
             def write_file(testVars, output_file_name):
               environment = Environment(loader=FileSystemLoader("tests/templates/"))
               template = environment.get_template("module.tpl")
-              filename = "main.tf"
+              filename = "terraform.tfvars"
               content = template.render(
                     name = output_file_name,
                     vm_count = random.choice(testVars['vm_count']),
@@ -77,8 +77,8 @@ jobs:
     - name: Upload main.tf file for job 2
       uses: actions/upload-artifact@v4
       with:
-        name: terraform_main
-        path: main.tf
+        name: terraform_vars
+        path: terraform.tfvars
 
   test-terraform-apply:
     needs: build-terraform-file
@@ -89,16 +89,11 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Go to tests dir
-      shell: bash
-      run: |
-        cd tests
     
     - name: Download main
       uses: actions/download-artifact@v4
       with:
-        name: terraform_main
+        name: terraform_vars
     
     - run: |
           terraform init
