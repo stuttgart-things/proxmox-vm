@@ -46,7 +46,7 @@ jobs:
             def write_file(testVars, output_file_name):
               environment = Environment(loader=FileSystemLoader("tests/templates/"))
               template = environment.get_template("module.tpl")
-              filename = "terraform.tfvars"
+              filename = "main.tf"
               content = template.render(
                     name = output_file_name,
                     vm_count = random.choice(testVars['vm_count']),
@@ -74,11 +74,11 @@ jobs:
               main()
 
 
-    - name: Upload main.tf file for job 2
+    - name: Upload main file for job 2
       uses: actions/upload-artifact@v4
       with:
-        name: terraform_vars
-        path: terraform.tfvars
+        name: terraform_main
+        path: main.tf
 
   test-terraform-apply:
     needs: build-terraform-file
@@ -89,13 +89,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        path: "./tests"
     
     - name: Download main
       uses: actions/download-artifact@v4
       with:
-        name: terraform_vars
+        name: terraform_main
     
-    - run: |
+    - name: Run teraform init, plan and apply
+      run: |
           terraform init
           terraform plan -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
           terraform apply --auto-approve -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
@@ -107,42 +110,35 @@ jobs:
         name: terraform_state
         path: terraform.tfstate
 
-    - name: Run in Python Terraform Destroy
+    - name: Run Terraform Destroy
       run: |
         terraform destroy --auto-approve -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
 
-#  cleanup:
-#    if: ${{ always() }}
-#    needs: test-terraform-apply
-#    runs-on: self-hosted
-#    steps:
-#    - name: Checkout code
-#      uses: actions/checkout@v4
-#    - uses: actions/setup-node@v4
-#      with:
-#        node-version: 20
-#
-#    - name: Setup Python
-#      uses: actions/setup-python@v5
-#      with:
-#        python-version: '3.10'
-#
-#    - uses: hashicorp/setup-terraform@v3
-#
-#    - name: Install dependencies
-#      run: |
-#        python -m pip install github-action-utils  python-terraform
-#
-#    - name: Download tfstate
-#      uses: actions/download-artifact@v4
-#      with:
-#        name: terraform_state
-#
-#    - name: Download main
-#      uses: actions/download-artifact@v4
-#      with:
-#        name: terraform_main
-#
-#    - name: Run Python Terraform Destroy
-#      run: |
-#        python3 tests/terraform_destroy.py
+  cleanup:
+    if: ${{ always() }}
+    needs: test-terraform-apply
+    runs-on: ghr-proxmox-vm-sthings-cicd
+    environment: k8s
+    container:
+      image: hashicorp/terraform:1.6
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        path: "./tests"
+
+    - name: Download tfstate
+      uses: actions/download-artifact@v4
+      with:
+        name: terraform_state
+
+    - name: Download main
+      uses: actions/download-artifact@v4
+      with:
+        name: terraform_main
+
+    - name: Run Terraform Destroy
+      run: |
+        terraform init
+        terraform destroy --auto-approve -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
+
