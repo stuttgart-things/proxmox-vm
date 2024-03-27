@@ -139,5 +139,6 @@ jobs:
 
     - name: Run Terraform Destroy
       run: |
+        terraform init
         terraform destroy --auto-approve -var="pve_api_url=${{ secrets.PVE_API_URL }}" -var="pve_api_user=${{ secrets.PVE_API_USER }}" -var="pve_api_password=${{ secrets.PVE_API_PASSWORD }}" -var="vm_ssh_user=${{ secrets.VM_SSH_USER }}" -var="vm_ssh_password=${{ secrets.VM_SSH_PASSWORD }}" -var="pve_api_tls_verify=${{ vars.PVE_API_TLS_VERIFY }}"
 
