@@ -104,6 +104,11 @@ variable "vm_memory" {
   default     = 4096
   type        = number
   description = "amount of memory of the vm"
+  
+  validation {
+    condition     = contains([1024, 2048, 4096, 8192], var.vm_memory)
+    error_message = "Valid values for vm_memory are (1024, 2048, 4096, 8192)"
+  }
 }
 
 variable "vm_disk_size" {
