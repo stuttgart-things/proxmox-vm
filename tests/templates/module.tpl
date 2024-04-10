@@ -1,5 +1,5 @@
 module "proxmox-vm" {
-  source                  = "git::https://github.com/stuttgart-things/proxmox-vm.git"
+  source                  = "../."
   pve_api_url             = var.pve_api_url
   pve_api_user            = var.pve_api_user
   pve_api_password        = var.pve_api_password
@@ -8,14 +8,14 @@ module "proxmox-vm" {
   pve_cluster_node        = "sthings-pve1"
   pve_datastore           = "{{ pve_datastore }}"
   pve_folder_path         = "stuttgart-things"
-  pve_network             = "vmbr103"
+  pve_network             = "{{ pve_network }}"
   vm_count                = {{ vm_count }}
   vm_name                 = "{{ name }}"
   vm_notes                = "vm-info"
   vm_template             = "ubuntu22"
   vm_num_cpus             = "{{ vm_num_cpus }}"
-  vm_memory               = "4096"
-  vm_disk_size            = "32G"
+  vm_memory               = {{ vm_memory }}
+  vm_disk_size            = "{{ vm_disk_size }}"
   vm_ssh_user             = var.vm_ssh_user
   vm_ssh_password         = var.vm_ssh_password
 }

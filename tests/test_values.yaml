@@ -8,7 +8,24 @@ vm_num_cpus: # should pick one of them randomly
   - 2
   - 4
   - 8
-#vm_name: #E.G. RANDOM NAME W/ LENGHT XY OR PREFIX MAYBE - UP TO YOU BUT THING OF CONSTRAINS LIKE LENGHT OR FORBIDDEN CHARS LIKE _
 pve_datastore: # should pick one of them randomly
   - datastore
   - v3700 
+pve_network:
+  - vmbr101
+  - vmbr102 
+  - vmbr103
+  - vmbr104
+vm_disk_size:
+  - 20G
+  - 32G
+  - 64G
+  - 96G
+  - 128G
+  - 196G
+  - 256G
+vm_memory:
+  - 1024 
+  - 2048
+  - 4096
+  - 8192

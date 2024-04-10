@@ -52,6 +52,9 @@ jobs:
                     vm_count = random.choice(testVars['vm_count']),
                     vm_num_cpus = random.choice(testVars['vm_num_cpus']),
                     pve_datastore = random.choice(testVars['pve_datastore']),
+                    pve_network = random.choice(testVars['pve_network']),
+                    vm_disk_size = random.choice(testVars['vm_disk_size']),
+                    vm_memory = random.choice(testVars['vm_memory']),
                 )
 
               # Save template
