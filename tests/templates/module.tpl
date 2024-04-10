@@ -1,5 +1,5 @@
 module "proxmox-vm" {
-  source                  = "git::https://github.com/stuttgart-things/proxmox-vm.git"
+  source                  = "../."
   pve_api_url             = var.pve_api_url
   pve_api_user            = var.pve_api_user
   pve_api_password        = var.pve_api_password

@@ -54,7 +54,7 @@ jobs:
                     pve_datastore = random.choice(testVars['pve_datastore']),
                     pve_network = random.choice(testVars['pve_network']),
                     vm_disk_size = random.choice(testVars['vm_disk_size']),
-                    vm_memory = random.choice(tastVars['vm_memory']),
+                    vm_memory = random.choice(testVars['vm_memory']),
                 )
 
               # Save template
