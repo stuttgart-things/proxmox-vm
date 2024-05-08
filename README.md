@@ -10,7 +10,7 @@ Terraform module for creating proxmox vms
 # CALL MODULE - main.tf
 # main.tf
 module "proxmox-vm" {
-  source                  = "git::https://github.com/stuttgart-things/proxmox-vm.git"
+  source                  = "git::https://github.com/stuttgart-things/proxmox-vm.git?ref=v2.9.14-1.5.5"
   pve_api_url             = var.pve_api_url
   pve_api_user            = var.pve_api_user
   pve_api_password        = var.pve_api_password
