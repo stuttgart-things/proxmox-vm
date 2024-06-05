@@ -1,4 +1,6 @@
 # stuttgart-things/proxmox-vm
+# this branch uses a rc terraform provider
+# development branch - do not use in production!
 
 Terraform module for creating proxmox vms
 
