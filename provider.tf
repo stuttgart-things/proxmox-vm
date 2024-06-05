@@ -4,7 +4,7 @@ terraform {
   required_providers {
     proxmox = {
       source  = "Telmate/proxmox"
-      version = ">= 2.9.14"
+      version = ">= 3.0.1-rc2"
     }
   }
 }
@@ -15,4 +15,5 @@ provider "proxmox" {
   pm_password = var.pve_api_password
   pm_tls_insecure = var.pve_api_tls_verify
 }
+
 
