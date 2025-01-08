@@ -16,7 +16,7 @@ jobs:
     runs-on: ghr-proxmox-vm-sthings-cicd
     environment: k8s
     container:
-      image: eu.gcr.io/stuttgart-things/machineshop:v1.7.2 
+      image: eu.gcr.io/stuttgart-things/machineshop:v2.6.3 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
