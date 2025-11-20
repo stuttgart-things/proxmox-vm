@@ -19,7 +19,7 @@ jobs:
       image: eu.gcr.io/stuttgart-things/machineshop:v1.7.2 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install dependencies
       id: pip
@@ -91,7 +91,7 @@ jobs:
       image: hashicorp/terraform:1.11
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         path: "./tests"
     
@@ -126,7 +126,7 @@ jobs:
       image: hashicorp/terraform:1.11
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         path: "./tests"
 
