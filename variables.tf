@@ -106,8 +106,8 @@ variable "vm_memory" {
   description = "amount of memory of the vm"
   
   validation {
-    condition     = contains([1024, 2048, 4096, 8192], var.vm_memory)
-    error_message = "Valid values for vm_memory are (1024, 2048, 4096, 8192)"
+    condition     = contains([1024, 2048, 4096, 8192, 12288, 16384, 20480, 24576], var.vm_memory)
+    error_message = "Valid values for vm_memory are (1024, 2048, 4096, 8192, 12288, 16384, 20480, 24576)"
   }
 }
 
