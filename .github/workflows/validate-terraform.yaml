@@ -17,7 +17,7 @@ jobs:
     uses: stuttgart-things/stuttgart-things/.github/workflows/validate-terraform.yaml@main  
     with:
       environment-name: k8s
-      runs-on: ghr-proxmox-vm-sthings-cicd
+      runs-on: ghr-proxmox-vm-in-cluster
       terraform-version: 1.6
       tflint-version: "v0.50.0"
       continue-error: false
