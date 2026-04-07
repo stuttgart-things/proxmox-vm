@@ -2,6 +2,10 @@
 
 Terraform module for creating Proxmox virtual machines based on the [Telmate/proxmox](https://registry.terraform.io/providers/Telmate/proxmox/latest) provider (v3.x).
 
+| | |
+|---|---|
+| Documentation | [stuttgart-things.github.io/proxmox-vm](https://stuttgart-things.github.io/proxmox-vm/) |
+
 ## Usage
 
 ```hcl
