@@ -49,4 +49,5 @@ This module can also be used with [Crossplane](https://crossplane.io/) via the U
 ## Related Documentation
 
 - [Variables Reference](variables.md)
+- [Proxmox API Discovery](proxmox-api-discovery.md)
 - [CI/CD](CICD.md)
