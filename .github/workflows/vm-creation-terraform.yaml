@@ -16,7 +16,7 @@ jobs:
     runs-on: ghr-proxmox-vm-in-cluster
     environment: k8s
     container:
-      image: python:3.12-slim
+      image: python:3.14-slim
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
