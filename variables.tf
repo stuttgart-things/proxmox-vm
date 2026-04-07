@@ -123,12 +123,6 @@ variable "vm_disk_size" {
 
 }
 
-variable "vm_disk_type" {
-  default     = "virtio"
-  type        = string
-  description = "type of disk"
-}
-
 variable "vm_bootdisk" {
   default     = "virtio0"
   type        = string
