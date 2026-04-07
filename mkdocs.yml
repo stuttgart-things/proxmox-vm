@@ -1,0 +1,10 @@
+site_name: Proxmox VM
+site_description: Terraform module for creating Proxmox virtual machines
+
+nav:
+  - Home: index.md
+  - Variables: variables.md
+  - CI/CD: CICD.md
+
+plugins:
+  - techdocs-core

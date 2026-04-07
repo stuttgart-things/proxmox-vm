@@ -1,0 +1,27 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: proxmox-vm
+  description: Terraform module for creating Proxmox virtual machines
+  annotations:
+    github.com/project-slug: stuttgart-things/proxmox-vm
+    backstage.io/techdocs-ref: url:https://github.com/stuttgart-things/proxmox-vm/tree/main
+    backstage.io/source-location: url:https://github.com/stuttgart-things/proxmox-vm
+  tags:
+    - terraform
+    - proxmox
+    - infrastructure
+    - vm
+  links:
+    - url: https://github.com/stuttgart-things/proxmox-vm
+      title: GitHub Repository
+      icon: github
+    - url: https://registry.terraform.io/providers/Telmate/proxmox/latest/docs
+      title: Provider Documentation
+      icon: docs
+spec:
+  type: library
+  lifecycle: production
+  owner: platform-team
+  system: platform-engineering
