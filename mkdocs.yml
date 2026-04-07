@@ -4,6 +4,7 @@ site_description: Terraform module for creating Proxmox virtual machines
 nav:
   - Home: index.md
   - Variables: variables.md
+  - Proxmox API Discovery: proxmox-api-discovery.md
   - CI/CD: CICD.md
 
 plugins:

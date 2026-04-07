@@ -72,6 +72,37 @@ output "ip" {
 | `mac` | MAC addresses of created VMs |
 | `id` | Proxmox VM IDs |
 
+## Proxmox API Discovery
+
+Before using this module, gather available resources from the Proxmox API:
+
+```bash
+export PVE_HOST="https://your-pve-host:8006"
+export PVE_TICKET=$(curl -sk \
+  -d "username=user@realm&password=secret" \
+  "$PVE_HOST/api2/json/access/ticket" | jq -r '.data.ticket')
+
+# Cluster nodes (pve_cluster_node)
+curl -sk -b "PVEAuthCookie=$PVE_TICKET" "$PVE_HOST/api2/json/nodes" | jq -r '.data[].node'
+
+# VM templates (vm_template)
+curl -sk -b "PVEAuthCookie=$PVE_TICKET" "$PVE_HOST/api2/json/cluster/resources?type=vm" \
+  | jq '.data[] | select(.template==1) | {name,vmid,node}'
+
+# Datastores (pve_datastore)
+curl -sk -b "PVEAuthCookie=$PVE_TICKET" "$PVE_HOST/api2/json/storage" \
+  | jq -r '.data[] | "\(.storage) (\(.type))"'
+
+# Network bridges (pve_network)
+curl -sk -b "PVEAuthCookie=$PVE_TICKET" "$PVE_HOST/api2/json/nodes/<node>/network" \
+  | jq -r '.data[] | select(.type=="bridge") | .iface'
+
+# Resource pools (pve_folder_path)
+curl -sk -b "PVEAuthCookie=$PVE_TICKET" "$PVE_HOST/api2/json/pools" | jq -r '.data[].poolid'
+```
+
+See the full [Proxmox API Discovery](docs/proxmox-api-discovery.md) guide for details.
+
 ## Crossplane Usage
 
 This module can be used with the [Upbound Terraform Provider](https://marketplace.upbound.io/providers/upbound/provider-terraform/) for Crossplane:
