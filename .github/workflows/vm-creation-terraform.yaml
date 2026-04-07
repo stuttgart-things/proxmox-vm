@@ -13,7 +13,7 @@ on:
 jobs:
 
   build-terraform-file:
-    runs-on: ghr-proxmox-vm-sthings-cicd
+    runs-on: ghr-proxmox-vm-in-cluster
     environment: k8s
     container:
       image: eu.gcr.io/stuttgart-things/machineshop:v1.7.2 
@@ -85,7 +85,7 @@ jobs:
 
   test-terraform-apply:
     needs: build-terraform-file
-    runs-on: ghr-proxmox-vm-sthings-cicd
+    runs-on: ghr-proxmox-vm-in-cluster
     environment: k8s
     container:
       image: hashicorp/terraform:1.11
@@ -120,7 +120,7 @@ jobs:
   cleanup:
     if: ${{ always() }}
     needs: test-terraform-apply
-    runs-on: ghr-proxmox-vm-sthings-cicd
+    runs-on: ghr-proxmox-vm-in-cluster
     environment: k8s
     container:
       image: hashicorp/terraform:1.11
