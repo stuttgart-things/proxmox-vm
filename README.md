@@ -65,6 +65,7 @@ output "ip" {
 | `vm_network_type` | string | `"virtio"` | Network card model |
 | `vm_network_address0` | string | `"ip=dhcp"` | IP config for cloud-init |
 | `vm_macaddr` | string | `null` | MAC address (optional) |
+| `vm_vlan_tag` | number | `-1` | VLAN tag for the NIC (e.g. on `vmbrvlan`); `-1` = untagged, valid `2`-`4094` |
 | `vm_ssh_user` | string | `""` | SSH username for provisioner |
 | `vm_ssh_password` | string | `""` | SSH password for provisioner |
 

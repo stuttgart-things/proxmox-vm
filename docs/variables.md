@@ -60,6 +60,7 @@
 | `vm_network_type` | string | `"virtio"` | Network card model |
 | `vm_network_address0` | string | `"ip=dhcp"` | Cloud-init IP configuration |
 | `vm_macaddr` | string | `null` | MAC address (auto-generated if null) |
+| `vm_vlan_tag` | number | `-1` | VLAN tag for the NIC (e.g. on `vmbrvlan`). `-1` = untagged; valid `2`-`4094` |
 
 ## SSH Provisioner
 
