@@ -104,7 +104,7 @@ variable "vm_memory" {
   default     = 4096
   type        = number
   description = "amount of memory of the vm"
-  
+
   validation {
     condition     = contains([1024, 2048, 4096, 8192, 12288, 16384, 20480, 24576], var.vm_memory)
     error_message = "Valid values for vm_memory are (1024, 2048, 4096, 8192, 12288, 16384, 20480, 24576)"
@@ -163,6 +163,17 @@ variable "vm_macaddr" {
   default     = null
   type        = string
   description = "Mac address of desired vm"
+}
+
+variable "vm_vlan_tag" {
+  default     = -1
+  type        = number
+  description = "VLAN tag for the network interface (e.g. on bridge vmbrvlan). Set to -1 for no VLAN tag (untagged)."
+
+  validation {
+    condition     = var.vm_vlan_tag == -1 || (var.vm_vlan_tag >= 2 && var.vm_vlan_tag <= 4094)
+    error_message = "Valid values for vm_vlan_tag are -1 (untagged) or 2-4094."
+  }
 }
 
 variable "pve_api_url" {

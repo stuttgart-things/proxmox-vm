@@ -1,6 +1,6 @@
 resource "proxmox_vm_qemu" "proxmox_vm" {
-  target_node = var.pve_cluster_node
-  pool        = var.pve_folder_path
+  target_node        = var.pve_cluster_node
+  pool               = var.pve_folder_path
   start_at_node_boot = var.vm_onboot
   count              = var.vm_count
   name               = count.index > 0 ? "${var.vm_name}-${count.index + 1}" : var.vm_name
@@ -31,6 +31,7 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
     model   = var.vm_network_type
     bridge  = var.pve_network
     macaddr = var.vm_macaddr
+    tag     = var.vm_vlan_tag
   }
 
   lifecycle {
