@@ -22,6 +22,9 @@ module "vm" {
   pve_folder_path  = "stuttgart-things"
   pve_network      = "vmbr101"
 
+  # NOTE: "ubuntu22" is a PLACEHOLDER. Query your cluster for real template
+  # names/VMIDs (docs/proxmox-api-discovery.md) — in LabUL no such template
+  # exists. examples/09-labul-smoketest has verified values.
   vm_name     = "minimal"
   vm_notes    = "created by terraform"
   vm_template = "ubuntu22"

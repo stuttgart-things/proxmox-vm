@@ -280,6 +280,33 @@ failed at plan time. `-1` is now treated as a module-level sentinel and the
 attribute is omitted entirely, which is what actually means "no VLAN tag". The
 variable's contract is unchanged.
 
+## Verified against a live cluster
+
+The `disks` migration was smoke-tested end to end on LabUL (2026-08-24, VM 9101
+on `ul-pve10`, cloned from template 110 `sthings-u26`):
+
+```
+ide2      DD-sthings:9101/vm-9101-cloudinit.raw,media=cdrom
+virtio0   V5010-01-1:vm-9101-disk-1,replicate=0,size=32G
+ciuser    sthings
+smbios1   uuid=…,manufacturer=c3R1dHRnYXJ0LXRoaW5ncw==,product=…
+tags      smoketest;terraform
+net0      virtio=BC:24:11:51:C7:9F,bridge=vmbrvlan,tag=101
+```
+
+The template carries **no** cloud-init drive — `ide2` above was created by the
+module. That is precisely what the legacy `disk` block could not do. A second
+`terraform plan` reports `No changes.`
+
+Two perpetual diffs surfaced only in that live run and are fixed here:
+
+- **`bootdisk` is no longer declared.** The provider does write it back, but
+  as an empty string — modern Proxmox has no legacy `bootdisk` field and
+  expresses boot order as `boot: order=virtio0;net0`. State got `""` while the
+  config insisted on `"virtio0"`, so every plan wanted to add it again.
+- **`startup_shutdown` is ignored.** The provider returns a block of `-1`
+  defaults that the module never declares, so every plan wanted to remove it.
+
 ## Known warts
 
 Kept as-is because fixing them would break existing callers. Documented so they

@@ -37,9 +37,20 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
   ipconfig0          = var.vm_network_address0
   memory             = var.vm_memory
   scsihw             = var.vm_storage_controller
-  bootdisk           = var.vm_bootdisk
-  agent              = var.vm_guest_agent
-  qemu_os            = var.vm_os_type
+  # `bootdisk` is deliberately NOT set — declaring it produces a PERPETUAL DIFF.
+  #
+  # The provider DOES write it back (`d.Set("bootdisk", config.BootDisk)`, in
+  # both rc07 and rc09), but it writes back an empty string: modern Proxmox no
+  # longer returns a legacy `bootdisk` field. It expresses boot order as
+  # `boot: order=virtio0;net0` instead — confirmed on live VM 9101, whose
+  # config had `boot` and no `bootdisk` at all. So state gets "" while the
+  # config insists on "virtio0", and every plan wants to add it again.
+  #
+  # The attribute is Optional+Computed, so leaving it out is clean, and the
+  # real boot order follows from the `disks` layout anyway.
+  # var.vm_bootdisk still drives which slot block is emitted below.
+  agent   = var.vm_guest_agent
+  qemu_os = var.vm_os_type
 
   # Clone by name (vm_template) or by VMID (vm_clone_id) — never both. The
   # precondition below rejects the ambiguous case rather than letting the
@@ -326,6 +337,10 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
     # live VM is silently ignored — adjust it in Proxmox, or taint the VM.
     ignore_changes = [
       network,
+      # Provider noise, not config: Telmate reads back a startup_shutdown block
+      # of -1 defaults that this module never declares, so every plan wants to
+      # remove it. Confirmed on a live VM (LabUL 9101).
+      startup_shutdown,
     ]
 
     precondition {

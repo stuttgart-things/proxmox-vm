@@ -71,15 +71,24 @@ curl -sk -b "PVEAuthCookie=$PVE_TICKET" \
 
 ## Example Output
 
+Real output from LabUL, **2026-08-24**. Treat it as a snapshot, not a
+reference — every value below had already drifted from the documents that
+described it. The whole point of this page is that you re-run the queries
+instead of copying values out of a doc.
+
 ```
 === NODES ===
 ul-pve01 (online)
 ul-pve02 (online)
+ul-pve10 (online)
+ul-pve11 (online)      <- storage API hangs, cannot clone; see below
 
 === TEMPLATES ===
-ubuntu24 (vmid: 160, node: ul-pve01)
-ubuntu22 (vmid: 152, node: ul-pve01)
-rocky9   (vmid: 140, node: ul-pve01)
+sthings-u26                 (vmid: 110, node: ul-pve10)
+ubuntu26-base-os            (vmid: 144, node: ul-pve11)
+ubuntu26-base-20260728-1419 (vmid: 192, node: ul-pve11)
+ubuntu26-base-20260731-0909 (vmid: 211, node: ul-pve11)
+Deb13-Template              (vmid: 996, node: ul-pve10)
 
 === STORAGE ===
 V5010-01-1 (lvm) - images,rootdir
@@ -104,3 +113,37 @@ LabUL-Infra
 | Storage | `pve_datastore` |
 | Bridges | `pve_network` |
 | Pools | `pve_folder_path` |
+
+
+## Two things the queries above will not tell you
+
+**1. A node can be "online" and still be unable to build.** `ul-pve11` reports
+`online` in `/cluster/status` and answers `/nodes/ul-pve11/status` in
+milliseconds, but every *storage* call on it times out:
+
+```bash
+for n in ul-pve01 ul-pve02 ul-pve10 ul-pve11; do
+  echo -n "$n -> "
+  curl -sk -o /dev/null -w '%{http_code} %{time_total}s\n' --max-time 45 \
+    -b "PVEAuthCookie=$PVE_TICKET" "$PVE_HOST/api2/json/nodes/$n/storage"
+done
+# ul-pve01 -> 200 0.3s
+# ul-pve11 -> 596 30.0s
+```
+
+A clone has to resolve the target storage, so on such a node it fails with a
+bare `596 Connection timed out` that names neither the node nor the storage.
+**Run this check before blaming Terraform or the provider.**
+
+**2. Whether a template has a cloud-init drive.** The template listing does not
+show it, and no LabUL template has one — they are all `virtio0` and nothing
+else. Check per template:
+
+```bash
+curl -sk -b "PVEAuthCookie=$PVE_TICKET" \
+  "$PVE_HOST/api2/json/nodes/<node>/qemu/<vmid>/config" \
+  | jq '{name, virtio0, scsi0, ide2}'
+```
+
+No `ide2` means every `vm_ci_*` variable is inert unless you set
+`vm_cloudinit_datastore`, which makes this module create the drive.

@@ -81,7 +81,13 @@ module "kind_vm" {
   vm_name  = "u26-kind2"
   vm_notes = "kind box; managed by terraform"
 
-  # spec.vm.templateVmId: "144" — ubuntu26-base-os
+  # spec.vm.templateVmId: "144" — ubuntu26-base-os.
+  # NOTE (2026-08-24): faithful to the XR, but NOT currently buildable — 144
+  # lives on ul-pve11, whose storage API times out, so the clone fails with a
+  # bare 596. The XR has the same problem, since the labul EnvironmentConfig
+  # pins node ul-pve11 and templateVmId 211. See
+  # docs/labul-ul-pve11-incident.md; examples/09-labul-smoketest has a
+  # configuration that does build today.
   vm_clone_id   = 144
   vm_full_clone = true
 

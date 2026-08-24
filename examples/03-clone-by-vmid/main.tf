@@ -31,7 +31,10 @@ module "vm" {
   vm_name = "by-vmid"
 
   # --- opt-in: clone source ---
-  vm_clone_id   = 144  # ubuntu26-base-os
+  # 144 = ubuntu26-base-os. NOTE (2026-08-24): 144 lives on ul-pve11, which
+  # currently cannot clone — every storage call there times out. Use 110 on
+  # ul-pve10 until that is fixed. See docs/labul-ul-pve11-incident.md.
+  vm_clone_id   = 144
   vm_full_clone = true # not a linked clone: survives deleting the template
 
   # --- opt-in: pinned VMID ---

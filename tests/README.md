@@ -59,20 +59,51 @@ SDN.Use                # only if you set vm_vlan_tag on an SDN-managed bridge
 Proxmox resolves the **deepest matching ACL path**, so a grant at `/` does not
 rescue a more specific deny further down.
 
-**C. A template**, and this is where the traps are:
+**C. A template.** Do not take the VMID from any document — including this one.
+Query it. The LabUL inventory below was verified against the live API on
+**2026-08-24** and had already drifted from every doc that described it:
 
-- **Its VMID, not just its name.** In LabUL *two* templates are called
-  `sthings-u26` (110 and 211), so `vm_template = "sthings-u26"` is ambiguous —
-  use `vm_clone_id`. This is exactly the case `vm_clone_id` was added for.
-- **VMID 110 is the wrong one.** It ships `/etc/cloud/cloud-init.disabled`, so
-  cloud-init never runs and every clone keeps the template's hostname. Use
-  **211**, which removes the file in its provisioner.
+| VMID | Name | Node | Root disk | cloud-init drive |
+|------|------|------|-----------|------------------|
+| 110 | `sthings-u26` | ul-pve10 | `virtio0` on V5010-01-1 | none |
+| 144 | `ubuntu26-base-os` | ul-pve11 | `virtio0` on DD-sthings | none |
+| 192 | `ubuntu26-base-20260728-1419` | ul-pve11 | — | none |
+| 211 | `ubuntu26-base-20260731-0909` | ul-pve11 | `virtio0` on DD-sthings | none |
+
+```bash
+curl -sk -b "PVEAuthCookie=$PVE_TICKET" "$PVE_HOST/api2/json/cluster/resources?type=vm" \
+  | jq '.data[] | select(.template==1) | {name,vmid,node}'
+```
+
+What changed against the older notes, and why trusting them costs you an hour:
+
+- **`ubuntu24` no longer exists.** The April test harness in
+  `terraform/proxmox-test` still names it; that harness cannot run as written.
+- **`sthings-u26` is no longer ambiguous.** It is VMID 110 only. 211 was
+  renamed to `ubuntu26-base-20260731-0909`, so the "two templates share a name"
+  warning in the `proxmoxvm` EnvironmentConfig comments no longer describes
+  reality. Cloning by name would now resolve — but `vm_clone_id` is still the
+  right call, because the name is what drifted.
+- **NO template carries a cloud-init drive.** All four have `virtio0` and
+  nothing else. This is why `vm_cloudinit_datastore` is mandatory for any
+  `vm_ci_*` to work here — the module creates the drive, nothing else does.
+
+⚠️ **`ul-pve11` cannot currently build.** Every storage API call on that node
+times out (596 after exactly 30 s), and a clone has to resolve the target
+storage. Templates 144, 192 and 211 all live there, so **110 on ul-pve10 is the
+only usable Linux template right now.** See `docs/labul-ul-pve11-incident.md`.
+
+- **VMID 110 does not run cloud-init.** It ships
+  `/etc/cloud/cloud-init.disabled`, so the guest ignores the cidata drive the
+  module attaches. The drive is still created (that part is verifiable); the
+  guest just will not consume it. For a guest-side cloud-init test you need
+  211 — i.e. you need ul-pve11 fixed first.
 - **Set `vm_cloudinit_datastore`** to test any `vm_ci_*` variable — the module
   now creates the cidata drive itself. Use the NFS store `DD-sthings`, not
   `V5010-01-1` (which orphans the cidata LV on stop/start). Check the
   template's root disk slot while you are there:
   ```bash
-  qm config 211 | grep -E 'ide2|virtio0'
+  qm config 110 | grep -E 'ide2|virtio0'
   ```
 - **Check for disks the module does not declare** before the first apply on an
   EXISTING VM — undeclared slots are deleted:
@@ -81,20 +112,28 @@ rescue a more specific deny further down.
   ```
 - **The QEMU guest agent must be installed and enabled**, or `output.ip` stays
   empty forever and `vm_enable_ssh_provisioner` has nothing to connect to.
-- **Note the root disk slot.** `sthings-u26` is on `virtio0`, not `scsi0` —
-  which happens to match this module's `vm_bootdisk` default.
+- **Note the root disk slot.** Every LabUL template is on `virtio0`, not
+  `scsi0` — which matches this module's `vm_bootdisk` default.
 
 **D. Placement values.** For LabUL these are already known, from the
 `proxmoxvm` EnvironmentConfig:
 
+These are the values a VM was actually built with on 2026-08-24 (VM 9101,
+verified and torn down again):
+
 | Terraform | LabUL value |
 |-----------|-------------|
-| `pve_cluster_node` | `ul-pve11` (**not** `ul-pve01` — the rebuild moved the ubuntu26 templates) |
-| `pve_datastore` | `V5010-01-1` |
+| `pve_cluster_node` | `ul-pve10` — **not** ul-pve11, which cannot clone; not ul-pve01, which no longer holds the templates |
+| `pve_datastore` | `V5010-01-1` (LVM, shared across nodes) |
+| `vm_cloudinit_datastore` | `DD-sthings` (NFS — survives the stop/start that orphans a cidata LV on V5010-01-1) |
 | `pve_network` | `vmbrvlan` (VLAN-aware trunk) |
-| `vm_vlan_tag` | `102` (10.31.102.0/24) |
+| `vm_vlan_tag` | `101` — what the templates themselves use; the EnvironmentConfig says 102 |
 | `pve_folder_path` | `stuttgart-things` |
-| `vm_clone_id` | `211` |
+| `vm_clone_id` | `110` (the only template on a working node) |
+| `vm_bootdisk` | `virtio0` (all LabUL templates) |
+
+The full working configuration is committed as
+[`examples/09-labul-smoketest`](../examples/09-labul-smoketest/).
 
 ### Running it
 
