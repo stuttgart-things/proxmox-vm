@@ -19,7 +19,7 @@ run "cloud_init_is_wired" {
     # field below is accepted and silently ignored.
     vm_cloudinit_datastore = "DD-sthings"
     vm_ci_user             = "sthings"
-    vm_ci_password         = "s3cr3t"
+    vm_ci_password         = "s3cr3t" # pragma: allowlist secret
     # Throwaway keys generated for this test only.
     vm_ci_ssh_keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPNoF5v3okHuuhNlrDKk1Yqbi+MqHfHaEkWuhQLNcKH/ unit-test-1",
@@ -129,7 +129,7 @@ run "bootstrap_created_when_opted_in" {
   variables {
     vm_enable_ssh_provisioner = true
     vm_ssh_user               = "sthings"
-    vm_ssh_password           = "s3cr3t"
+    vm_ssh_password           = "s3cr3t" # pragma: allowlist secret
     vm_count                  = 2
   }
 

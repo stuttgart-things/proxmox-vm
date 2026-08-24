@@ -9,10 +9,10 @@
 
 pve_api_url        = "https://ul-pve01.labul.sva.de:8006/api2/json"
 pve_api_user       = "terraform@pve"
-pve_api_password   = "CHANGEME"
+pve_api_password   = "CHANGEME" # pragma: allowlist secret
 pve_api_tls_verify = false
 
-vm_ci_password = "CHANGEME"
+vm_ci_password = "CHANGEME" # pragma: allowlist secret
 
 vm_ci_ssh_keys = [
   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... sthings@workstation",

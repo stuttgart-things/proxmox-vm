@@ -181,7 +181,7 @@ run "ci_settings_without_drive_warns" {
 
   variables {
     vm_ci_user     = "sthings"
-    vm_ci_password = "s3cr3t"
+    vm_ci_password = "s3cr3t" # pragma: allowlist secret
   }
 
   expect_failures = [check.cloudinit_settings_without_drive]
