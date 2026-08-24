@@ -1,0 +1,20 @@
+# Smoke-test values for examples/06-labul-kind. Copy to smoke.tfvars (gitignored)
+# and fill in the credentials. See tests/README.md for the full checklist.
+
+pve_api_url  = "https://ul-pve11.labul.sva.de:8006/api2/json"
+pve_api_user = "terraform@pve"
+
+# CHANGEME. Prefer the environment over a file on disk:
+#   export TF_VAR_pve_api_password='…'
+pve_api_password = ""
+
+# INVERTED: true DISABLES certificate checking. Correct for LabUL's
+# self-signed cluster certs.
+pve_api_tls_verify = true
+
+# cloud-init user password. Must be set, or cloud-init locks the account.
+ci_password = ""
+
+ci_ssh_keys = [
+  # "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA… you@workstation",
+]
