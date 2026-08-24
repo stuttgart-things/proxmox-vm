@@ -1,0 +1,88 @@
+---
+# ============================================================================
+# 08 — DRIVING THE MODULE FROM CROSSPLANE
+#
+# provider-terraform Workspace that calls this module. This is the "same VM,
+# other control plane" counterpart to examples/06-labul-kind: compare it with
+# crossplane/xrs/examples/nativeproxmoxvm.yaml, which reaches Proxmox natively
+# through provider-proxmox-bpg instead of wrapping Terraform.
+#
+# WHICH TO USE
+#   * The native XR gives you drift correction on a reconcile loop, per-field
+#     status, and the AnsibleRun hand-off. Prefer it for anything long-lived.
+#   * This Workspace is the pragmatic option when you want the Terraform
+#     module's exact semantics, or when you are moving existing Terraform
+#     state under Crossplane without rewriting it.
+#
+# NOTE ON `vars`: provider-terraform sends every value as a STRING. Numbers and
+# booleans are fine (Terraform coerces them to the declared type), but LIST
+# variables such as vm_tags and vm_ci_ssh_keys are NOT — pass those through
+# varFiles instead, as shown below, or they fail with an "Inappropriate value
+# for attribute" error.
+# ============================================================================
+apiVersion: tf.upbound.io/v1beta1
+kind: Workspace
+metadata:
+  name: u26-kind2
+  annotations:
+    crossplane.io/external-name: u26-kind2
+spec:
+  providerConfigRef:
+    name: terraform-default
+  forProvider:
+    source: Remote
+    module: git::https://github.com/stuttgart-things/proxmox-vm.git
+    vars:
+      # --- placement ---
+      - key: pve_cluster_node
+        value: ul-pve02
+      - key: pve_datastore
+        value: V5010-01-1
+      - key: pve_folder_path
+        value: stuttgart-things
+      - key: pve_network
+        value: vmbrvlan
+      - key: vm_vlan_tag
+        value: "102"
+      # --- identity ---
+      - key: vm_name
+        value: u26-kind2
+      - key: vm_count
+        value: "1"
+      # --- clone source: by VMID, matching spec.vm.templateVmId ---
+      - key: vm_clone_id
+        value: "144"
+      - key: vm_full_clone
+        value: "true"
+      # --- sizing ---
+      - key: vm_num_cpus
+        value: "8"
+      - key: vm_memory
+        value: "16384"
+      - key: vm_disk_size
+        value: 100G
+      # --- cloud-init ---
+      - key: vm_guest_agent
+        value: "1"
+      - key: vm_network_address0
+        value: ip=dhcp
+      - key: vm_ci_os_type
+        value: cloud-init
+      - key: vm_ci_user
+        value: sthings
+      # --- PegaProx opt-out ---
+      - key: vm_smbios_manufacturer
+        value: stuttgart-things
+      - key: vm_smbios_product
+        value: terraform-proxmox-vm
+    # API credentials, vm_ci_password and any LIST variables (vm_tags,
+    # vm_ci_ssh_keys) live here, in HCL rather than as flat strings.
+    varFiles:
+      - source: SecretKey
+        secretKeyRef:
+          namespace: default
+          name: pve-tfvars
+          key: terraform.tfvars
+  writeConnectionSecretToRef:
+    namespace: default
+    name: u26-kind2-connection

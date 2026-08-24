@@ -3,8 +3,11 @@ site_description: Terraform module for creating Proxmox virtual machines
 
 nav:
   - Home: index.md
+  - Examples: examples.md
   - Variables: variables.md
+  - 'Migration: disk to disks': migration-disks.md
   - Proxmox API Discovery: proxmox-api-discovery.md
+  - 'LabUL: ul-pve11 incident': labul-ul-pve11-incident.md
   - CI/CD: CICD.md
 
 plugins:

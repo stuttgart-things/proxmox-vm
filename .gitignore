@@ -1,0 +1,18 @@
+# Terraform working files — never commit these from a reusable module.
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Local variable files. examples/*/terraform.tfvars.example is committed on
+# purpose; the real ones carry credentials and are not.
+*.tfvars
+!*.tfvars.example
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
