@@ -63,24 +63,40 @@ second run.
 
 ### The cause
 
-Template 110's root disk carries a **volume ID that its storage cannot
-represent**:
+rc09 **derives** the post-clone volume ID from the template's own volume ID
+instead of reading back what Proxmox actually created. rc07 reads it back.
+
+Template 110's root disk is:
 
 ```
 virtio0  V5010-01-1:vm-110-disk-0.qcow2,cache=none,replicate=0,size=16G
-                                 ^^^^^^ .qcow2 on an LVM store
 ```
 
-LVM only holds raw volumes. When Proxmox clones this, it creates
-`vm-9101-disk-1` with `format=raw` — a different name *and* a different
-extension. rc09 **derives** the post-clone volume ID from the template's name
-instead of reading back what Proxmox actually created, so its follow-up update
-addresses a volume that never existed. rc07 reads it back.
+Cloning it to VM 9101, rc09 addresses `V5010-01-1:vm-9101-disk-0.qcow2` in its
+follow-up update. Proxmox created `V5010-01-1:vm-9101-disk-1` — a different
+index *and* no extension — so the update names a volume that never existed.
 
-Template 110 is the only one affected — 144, 192, 211 and 996 all carry
-well-formed `base-<vmid>-disk-0.raw` IDs. That makes this a latent provider
-bug that a malformed template happens to expose, not a general rc09 failure.
-It is still a hard blocker, because 110 is the template in use.
+!!! warning "This is a storage-class incompatibility, not one bad template"
+    An earlier revision of this page called template 110's volume ID
+    "malformed" and suggested rebuilding the template as a fix. **That was
+    wrong, and rebuilding would not help.**
+
+    `V5010-01-1` is LVM with **`snapshot-as-volume-chain: 1`** — the Proxmox 9
+    feature where LVM holds *qcow2-formatted* volumes so snapshots can be
+    expressed as volume chains. On that storage the `.qcow2` suffix is the
+    norm, not an anomaly:
+
+    ```
+    volumes on V5010-01-1:   .qcow2 = 114     no extension = 11
+    ```
+
+    A freshly built template lands there the same way, so a Packer rebuild
+    produces another `.qcow2` volume ID and changes nothing. The exposure is
+    every clone of any of those 114 volumes, not one template.
+
+    Templates 144, 192, 211 and 996 escape only because they sit on the NFS
+    store `DD-sthings` and carry `base-<vmid>-disk-0.raw` — a different
+    storage, not a better template.
 
 ### Second rc09 issue: `vm_state` drift
 
@@ -98,10 +114,18 @@ the bump.
 
 ### What a fix needs
 
-Either upstream reads the cloned volume ID back (the rc07 behaviour), or
-template 110 is rebuilt so its volume ID matches its storage. The second is
-worth doing regardless — the malformed ID is a latent trap for any tool that
-trusts it.
+**Upstream has to read the cloned volume ID back**, the way rc07 does. There is
+no configuration-side workaround and nothing to fix on the Proxmox side:
+`snapshot-as-volume-chain` is a supported storage layout, and a provider that
+predicts volume IDs rather than reading them will keep breaking on it.
+
+Rebuilding template 110 does **not** qualify, for the reason in the warning
+above — the new template would land on the same storage with the same naming.
+
+A rebuild is still worth doing, but for an unrelated reason: 110 ships
+`/etc/cloud/cloud-init.disabled`, so the guest ignores the cloud-init drive
+this module now creates correctly. That is a template problem. The volume ID
+is not.
 
 ### Why rc08 is skipped
 

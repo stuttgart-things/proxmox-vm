@@ -625,8 +625,14 @@ variable "vm_disk_format" {
   type        = string
   description = <<-EOT
     Root disk format — `raw`, `qcow2` or `vmdk`. Unset leaves the provider
-    default. Block-backed datastores (LVM, ZFS, Ceph) only accept `raw`;
-    asking for `qcow2` there fails at apply time, not at plan time.
+    default, which is the safe choice: what a datastore accepts is a property
+    of that datastore, and a wrong value fails at apply time, not at plan time.
+
+    Do not assume "block store means raw". Plain LVM, ZFS and Ceph take `raw`,
+    but LVM with Proxmox 9's `snapshot-as-volume-chain` deliberately holds
+    qcow2-formatted volumes so snapshots can be volume chains. Check the store:
+
+        GET /api2/json/storage/<name>   ->  .type, .["snapshot-as-volume-chain"]
   EOT
 }
 
