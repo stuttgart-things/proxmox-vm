@@ -103,7 +103,7 @@ until you set it. The one exception is `vm_enable_ssh_provisioner` — see
 | `vm_efi_disk_pre_enrolled_keys` | bool | `false` | Pre-enroll Microsoft Secure Boot keys. Refuses unsigned kernels/modules. |
 | `vm_cloudinit_datastore` | string | `null` | Datastore for the cloud-init (cidata) drive. **This is what makes every `vm_ci_*` variable work.** Pick a store that survives a stop/start. |
 | `vm_cloudinit_slot` | string | `"ide2"` | Slot for that drive — `ide0`-`ide3`. Must not collide with `vm_bootdisk`. |
-| `vm_disk_format` | string | `null` | Root disk format — `raw`, `qcow2`, `vmdk`. Block stores (LVM/ZFS/Ceph) only accept `raw`. |
+| `vm_disk_format` | string | `null` | Root disk format — `raw`, `qcow2`, `vmdk`. What a block store accepts depends on the store: plain LVM/ZFS/Ceph take `raw`, but LVM with Proxmox 9's `snapshot-as-volume-chain` holds `qcow2`. Check the store rather than assuming. |
 | `vm_disk_cache` | string | `null` | Cache mode. `unsafe` discards flushes and corrupts the guest on host power loss. |
 | `vm_disk_iothread` | bool | `null` | Dedicated I/O thread. **scsi/virtio only**, and Proxmox only honours it on `virtio-scsi-single`. |
 | `vm_disk_discard` | bool | `null` | Pass guest TRIM through to thin-provisioned storage. |

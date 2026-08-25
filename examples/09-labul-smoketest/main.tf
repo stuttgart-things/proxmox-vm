@@ -52,16 +52,18 @@
 # ---------------------------------------------------------------------------
 # DO NOT BUMP THE PROVIDER TO 3.0.2-rc09
 #
-# rc09 passes the whole offline suite and then fails at apply against THIS
-# template, deterministically:
+# rc09 passes the whole offline suite and then fails at apply, deterministically:
 #
 #   Error: error updating VM: api error: code: 500
 #          message: volume V5010-01-1:vm-9101-disk-0.qcow2 does not exist
 #
-# Template 110's volid carries a .qcow2 extension on an LVM store, which LVM
-# cannot represent. rc09 derives the cloned volid from that name instead of
-# reading back what Proxmox created (vm-9101-disk-1, raw). rc07 reads it back.
-# See docs/provider-versions.md.
+# rc09 DERIVES the cloned volid from the template's own volid instead of reading
+# back what Proxmox created (vm-9101-disk-1, no extension). rc07 reads it back.
+#
+# This is NOT a bad template, and rebuilding 110 would not help: V5010-01-1 is
+# LVM with `snapshot-as-volume-chain: 1`, so it holds qcow2-formatted volumes on
+# purpose and .qcow2 volids are the norm there -- 114 of its 125 volumes carry
+# one. Any clone of any of them is exposed. See docs/provider-versions.md.
 # ---------------------------------------------------------------------------
 # ============================================================================
 
