@@ -28,10 +28,15 @@
 # ---------------------------------------------------------------------------
 # TWO CONSTRAINTS YOU CANNOT DESIGN AROUND RIGHT NOW
 #
-# 1. ul-pve11 cannot clone. Every storage API call on that node times out
-#    (596 after exactly 30 s) and a clone must resolve the target storage.
-#    Templates 144, 192 and 211 all live there. See
-#    docs/labul-ul-pve11-incident.md.
+# 1. Templates 144, 192 and 211 cannot be cloned. The reason CHANGED on
+#    2026-08-25: ul-pve11's storage API used to time out (596 after 30 s) and
+#    now answers in 0.3 s again -- but those templates live on DD-sthings,
+#    where a more specific ACL grants only SVATemplates (AllocateTemplate +
+#    Audit, no AllocateSpace) and REPLACES the broader /storage grant. The
+#    provider clones to the SOURCE storage before moving, so the clone itself
+#    is denied with 403 no matter what pve_datastore says.
+#    => Never put a root disk on DD-sthings. The cidata drive there is fine.
+#    See docs/labul-ul-pve11-incident.md.
 #
 # 2. That leaves template 110 (sthings-u26, ul-pve10) as the only usable Linux
 #    template — and 110 ships /etc/cloud/cloud-init.disabled, so the GUEST
@@ -39,9 +44,25 @@
 #    it. So on 110 the cloud-init user, password, keys and static IP below do
 #    not reach the guest.
 #
-#    => For a guest that really consumes cloud-init, ul-pve11 has to be fixed
-#       so template 211 becomes reachable. Until then, either accept the
-#       template's baked-in credentials, or set vm_enable_ssh_provisioner.
+#    => For a guest that really consumes cloud-init, template 211 has to
+#       become clonable -- which now needs an ACL or a storage move, not a
+#       node repair. Until then, either accept the template's baked-in
+#       credentials, or set vm_enable_ssh_provisioner.
+#
+# ---------------------------------------------------------------------------
+# DO NOT BUMP THE PROVIDER TO 3.0.2-rc09
+#
+# rc09 passes the whole offline suite and then fails at apply against THIS
+# template, deterministically:
+#
+#   Error: error updating VM: api error: code: 500
+#          message: volume V5010-01-1:vm-9101-disk-0.qcow2 does not exist
+#
+# Template 110's volid carries a .qcow2 extension on an LVM store, which LVM
+# cannot represent. rc09 derives the cloned volid from that name instead of
+# reading back what Proxmox created (vm-9101-disk-1, raw). rc07 reads it back.
+# See docs/provider-versions.md.
+# ---------------------------------------------------------------------------
 # ============================================================================
 
 module "vm" {

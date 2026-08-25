@@ -5,6 +5,7 @@ Terraform module for creating Proxmox virtual machines based on the [Telmate/pro
 | | |
 |---|---|
 | Documentation | [stuttgart-things.github.io/proxmox-vm](https://stuttgart-things.github.io/proxmox-vm/) |
+| Provider pin | `3.0.2-rc07`, exact. **Do not bump to rc09** — it passes every offline check and then fails at apply. [Why](docs/provider-versions.md#why-rc09-is-blocked) |
 
 ## Usage
 
