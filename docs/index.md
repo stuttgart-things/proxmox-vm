@@ -58,6 +58,7 @@ This module can also be used with [Crossplane](https://crossplane.io/) via the U
 
 - [Examples](examples.md)
 - [Migration: disk to disks](migration-disks.md)
+- [Provider Versions](provider-versions.md)
 - [Variables Reference](variables.md)
 - [Proxmox API Discovery](proxmox-api-discovery.md)
 - [CI/CD](CICD.md)
