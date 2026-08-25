@@ -112,6 +112,7 @@ until you set it. The one exception is `vm_enable_ssh_provisioner` — see
 | `vm_disk_replicate` | bool | `null` | Include the root disk in storage replication. |
 | `vm_enable_ssh_provisioner` | bool | `false` | Run the legacy post-create SSH bootstrap. |
 | `vm_ssh_private_key` | string | `null` | PEM private key for that bootstrap, instead of `vm_ssh_password`. |
+| `vm_bootstrap_reset_machine_id` | bool | `false` | Regenerate `/etc/machine-id` during the bootstrap. **Changes the VM's IP** — the DHCP client id is derived from it — which makes the `ip` output stale. Only with `vm_enable_ssh_provisioner`. |
 
 ## Outputs
 
@@ -240,11 +241,40 @@ missing field, is why cloud-init never worked here.
 Full detail, including what a healthy plan looks like and the Crossplane
 rollout: **[docs/migration-disks.md](docs/migration-disks.md)**.
 
+## Bug fix: the SSH bootstrap no longer reboots the VM
+
+**If you enabled `vm_enable_ssh_provisioner` before, it failed every apply.**
+This is fixed.
+
+The bootstrap used to write `/etc/hostname`, regenerate the machine-id, reboot,
+and then reconnect. The reconnect could never succeed:
+
+> systemd-networkd derives its default DHCPv4 client identifier from
+> `/etc/machine-id`. Regenerating it changes the DHCP identity, so **the VM
+> comes back on a different IP** — while Terraform reconnects to
+> `default_ipv4_address`, captured at create time. It blocks until the 5 minute
+> connection timeout and `terraform apply` exits 1.
+
+Measured on a live cluster on 2026-08-25: four consecutive applies, ~8m20s each
+(~3 min to build the VM plus the 5 min timeout), with the address change
+confirmed in the guest journal (`10.31.101.131` → `.132`, `.134` → `.136`).
+
+The quieter half: even with a working reconnect, the **`ip` output would still
+be the create-time address**. A DNS record or an IP reservation taken from it
+would point at an address nobody answers on, while every stage before it
+reported success.
+
+The bootstrap now runs a single `hostnamectl set-hostname` — applied
+immediately, persisted, no reboot, no reconnect, lease untouched. The
+machine-id reset is available as
+[`vm_bootstrap_reset_machine_id`](#opt-in-variables) and defaults to **false**;
+turning it on still moves the VM's address, so only do it when nothing consumes
+the `ip` output.
+
 ## Behaviour change: the SSH bootstrap is now opt-in
 
-The post-create SSH bootstrap — write `/etc/hostname`, regenerate the
-machine-id, reboot, wait — used to run unconditionally on every create. It is
-now behind `vm_enable_ssh_provisioner`, which defaults to **false**.
+The post-create SSH bootstrap used to run unconditionally on every create. It
+is now behind `vm_enable_ssh_provisioner`, which defaults to **false**.
 
 **To keep the old behaviour**, add one line:
 

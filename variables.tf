@@ -546,6 +546,31 @@ variable "vm_ssh_private_key" {
   EOT
 }
 
+variable "vm_bootstrap_reset_machine_id" {
+  default     = false
+  type        = bool
+  description = <<-EOT
+    Regenerate `/etc/machine-id` during the SSH bootstrap. Only used when
+    `vm_enable_ssh_provisioner` is true.
+
+    Clones inherit the template's machine-id, and systemd-networkd derives its
+    default DHCPv4 client identifier from it — so several clones of one
+    template can present the SAME identity to the DHCP server and be handed the
+    same lease. Resetting fixes that.
+
+    **It also changes the VM's IP address**, at the next renewal or reboot,
+    because the DHCP identity is exactly what changed. The `ip` output was
+    captured before that and becomes stale. That is why this defaults to false
+    and why the provisioner no longer reboots: the module cannot both reset the
+    identity and promise you a correct address.
+
+    Prefer resetting the machine-id where nothing is holding the address yet —
+    in the template build, or in a configuration-management step that reads the
+    IP after the fact rather than before. Enable this only when you are not
+    consuming the `ip` output.
+  EOT
+}
+
 # =============================================================================
 # STORAGE — cloud-init drive and root-disk tuning
 #

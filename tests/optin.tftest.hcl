@@ -139,6 +139,59 @@ run "bootstrap_created_when_opted_in" {
   }
 }
 
+run "machine_id_reset_is_off_by_default" {
+  command = plan
+
+  variables {
+    vm_enable_ssh_provisioner = true
+    vm_ssh_user               = "sthings"
+    vm_ssh_password           = "s3cr3t" # pragma: allowlist secret
+  }
+
+  # Resetting the machine-id moves the VM to a different DHCP lease, which
+  # makes the `ip` output stale. It must never happen unless asked for.
+  assert {
+    condition     = var.vm_bootstrap_reset_machine_id == false
+    error_message = "vm_bootstrap_reset_machine_id must default to false: it changes the VM's IP"
+  }
+
+  assert {
+    condition     = length(terraform_data.bootstrap) == 1
+    error_message = "the bootstrap must still be created with the reset off"
+  }
+}
+
+run "machine_id_reset_can_be_opted_into" {
+  command = plan
+
+  variables {
+    vm_enable_ssh_provisioner     = true
+    vm_bootstrap_reset_machine_id = true
+    vm_ssh_user                   = "sthings"
+    vm_ssh_password               = "s3cr3t" # pragma: allowlist secret
+  }
+
+  assert {
+    condition     = length(terraform_data.bootstrap) == 1
+    error_message = "opting into the machine-id reset must not change how many bootstraps exist"
+  }
+}
+
+run "machine_id_reset_alone_does_not_create_a_bootstrap" {
+  command = plan
+
+  # Without vm_enable_ssh_provisioner there is no provisioner to carry it, so
+  # the flag must stay inert rather than quietly pulling one in.
+  variables {
+    vm_bootstrap_reset_machine_id = true
+  }
+
+  assert {
+    condition     = length(terraform_data.bootstrap) == 0
+    error_message = "vm_bootstrap_reset_machine_id must not create a bootstrap on its own"
+  }
+}
+
 # --- guardrails -------------------------------------------------------------
 
 run "both_clone_sources_is_rejected" {

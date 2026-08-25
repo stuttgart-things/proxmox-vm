@@ -148,10 +148,11 @@ silently ignore all of them.
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
-| `vm_enable_ssh_provisioner` | bool | `false` | Run the post-clone bootstrap: set hostname, regenerate machine-id, reboot. |
+| `vm_enable_ssh_provisioner` | bool | `false` | Run the post-clone bootstrap: set the hostname over SSH. No reboot. |
 | `vm_ssh_user` | string | `""` | SSH username for that bootstrap. |
 | `vm_ssh_password` | string | `""` | SSH password for that bootstrap. |
 | `vm_ssh_private_key` | string | `null` | PEM private key, as an alternative to the password. |
+| `vm_bootstrap_reset_machine_id` | bool | `false` | Regenerate `/etc/machine-id`. **Changes the VM's IP.** See below. |
 
 !!! danger "This used to run unconditionally"
     It now defaults to **off**. Existing VMs are unaffected — a `remote-exec`
@@ -162,3 +163,24 @@ silently ignore all of them.
     `terraform apply`: unreachable SSH fails the apply *after* the VM already
     exists, leaving a tainted resource that the next apply destroys and
     recreates.
+
+!!! warning "`vm_bootstrap_reset_machine_id` moves the VM's IP address"
+    systemd-networkd derives its default DHCPv4 client identifier from
+    `/etc/machine-id`. Regenerating it changes the DHCP identity, so the VM
+    takes a **different lease** at the next renewal or reboot — and the `ip`
+    output, captured before that, goes stale. A DNS record or IP reservation
+    made from it would point at an address nobody answers on.
+
+    It exists because clones inherit the template's machine-id, so several
+    clones can present the same identity to the DHCP server and be handed the
+    same lease. That is a real problem — but the module cannot both reset the
+    identity and promise a correct address.
+
+    Reset it where nothing holds the address yet: in the template build, or in
+    a configuration-management step that reads the IP afterwards rather than
+    before. Enable this only when you are not consuming the `ip` output.
+
+    This is also why the bootstrap no longer reboots. The old version rebooted
+    after resetting the machine-id and then reconnected to the create-time
+    address — which failed **every** apply, after a 5 minute timeout. Verified
+    on a live cluster on 2026-08-25.
