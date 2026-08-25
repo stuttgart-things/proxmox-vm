@@ -384,6 +384,42 @@ resource "proxmox_vm_qemu" "proxmox_vm" {
 # Existing state is unaffected: with the flag false no instance is created, and
 # provisioners are not tracked as resource attributes, so moving the block out
 # of proxmox_vm_qemu produces no diff on already-managed VMs.
+#
+# ---------------------------------------------------------------------------
+# WHY THERE IS NO REBOOT HERE ANY MORE
+#
+# This bootstrap used to do:
+#
+#   sudo echo '<name>' | sudo tee /etc/hostname
+#   sudo systemd-machine-id-setup
+#   sudo shutdown -r +0
+#
+# followed by a second remote-exec whose only job was to wait for the VM to
+# come back. That could not work, and it failed EVERY apply:
+#
+#   systemd-networkd derives its default DHCPv4 client identifier from
+#   /etc/machine-id. Regenerating the machine-id therefore changes the DHCP
+#   identity, and the VM comes back from the reboot ON A DIFFERENT IP.
+#
+# The second remote-exec reconnects to `default_ipv4_address`, which Terraform
+# captured at create time -- the OLD address. It then blocks until the 5 minute
+# connection timeout and `terraform apply` exits 1. Measured on LabUL,
+# 2026-08-25, four consecutive runs of ~8m20s each (~3 min to build the VM plus
+# the 5 min timeout), with the address change confirmed in the guest journal:
+#
+#   VM 246   boot -1: DHCPv4 address 10.31.101.131
+#            boot  0: DHCPv4 address 10.31.101.132
+#   VM 256   10.31.101.134 -> 10.31.101.136
+#
+# The quieter half of the bug: even with a working reconnect, the `ip` OUTPUT
+# would still be the create-time address. Anything downstream -- a DNS record,
+# an inventory, an IP reservation -- would point at an address nobody answers
+# on, and every stage before it would report success.
+#
+# So the fix is not a more patient reconnect. The provisioner must not change
+# the VM's network identity at all: set the hostname, which needs no reboot,
+# and leave the lease alone.
+# ---------------------------------------------------------------------------
 resource "terraform_data" "bootstrap" {
   count = var.vm_enable_ssh_provisioner ? var.vm_count : 0
 
@@ -418,17 +454,19 @@ resource "terraform_data" "bootstrap" {
     agent       = false
   }
 
+  # ONE remote-exec, no reboot, no reconnect. See the note above the resource
+  # for why the previous version could not work.
+  #
+  # hostnamectl applies the name to the running system immediately AND persists
+  # it to /etc/hostname, so there is nothing left that a reboot would finish.
   provisioner "remote-exec" {
-    inline = [
-      "sudo echo '${local.vm_names[count.index]}' | sudo tee /etc/hostname",
-      "sudo systemd-machine-id-setup",
-      "sudo shutdown -r +0"
-    ]
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "echo 'wait for reboot'"
-    ]
+    inline = concat(
+      ["sudo hostnamectl set-hostname '${local.vm_names[count.index]}'"],
+      # Opt-in, and deliberately last: see vm_bootstrap_reset_machine_id.
+      var.vm_bootstrap_reset_machine_id ? [
+        "sudo rm -f /etc/machine-id",
+        "sudo systemd-machine-id-setup",
+      ] : [],
+    )
   }
 }
